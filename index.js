@@ -11,6 +11,7 @@ import jwt from 'jsonwebtoken';
 import pg from "pg";
 import ejs from "ejs";
 import axios from "axios";
+import cookieParser from "cookie-parser";
 
 const app = express();
 const port = 3000;
@@ -18,8 +19,11 @@ const port = 3000;
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
+app.use(cookieParser())
 
 // paste
+
+
 
 db.connect();
 
@@ -74,8 +78,9 @@ app.post("/logout", (req, res) => {
 })
 // for run-code and update-credits
 const authenticate = function auth (req, res, next) {
+    console.log(req.cookies);
     const token = req.cookies.token;
-    if (token == None) return res.redirect('/login');
+    if (typeof(token) == undefined) return res.redirect('/login');
 
     jwt.verify(token, SECRET_TOKEN, (err, user) => {
         if (err) return res.redirect('/login');
@@ -93,6 +98,7 @@ async function updateCreds(user, creds){
         await db.query("UPDATE users SET credits = $1 WHERE username = $2;", [newCreds, user.username]);
     } else {
         // what to do here?
+        console.error("something went wrong");
     }
 }
 
@@ -108,6 +114,7 @@ async function runCode(language, src_code, input) {
                 headers: {
                     'Content-Type': 'application/json',
                     // paste 
+                    
                 },
             }
         )
@@ -119,23 +126,32 @@ async function runCode(language, src_code, input) {
 }
 
 app.post("/run-code", authenticate, async (req, res) => {
-    const { problem_statement, language, src_code } = req.body;
-    const response = await db.query("SELECT credits, input, output FROM PROBLEMS WHERE question = $1", [problem_statement]);
-    if(response.rows.length > 0){
+    const problem_statement = req.body.qtitle;
+    const language = req.body.language;
+    const src_code = req.body.submission;
+    console.log(problem_statement);
+    const response = await db.query("SELECT credits, input, expected_output FROM PROBLEMS WHERE title = $1", [problem_statement]);
+    if(response.rows.length > 0) {
         const testcases = response.rows;
-        let creds = testcases[0].credits;
-        const userSubmissionDetails = [];
-        for(let i = 0; i < testcases.length; i++) {
-            let {creds, input, expectedOutput} = testcases[0];
-            const submissionResult = await runCode(language, src_code, input);
-            const status = submissionResult.stdout.trim() == expectedOutput.trim();
+        console.log(testcases);
+        const creds = testcases[0].credits;
+        console.log(creds);
+        const input = testcases[0].input;
+        console.log(input);
+        const expectedOutput = testcases[0].expected_output;
+        console.log(expectedOutput)
+        for(let i = 0; i < input.length; i++) {
+            const submissionResult = await runCode(language, src_code, input[i]);
+            console.log(submissionResult);
+            const status = submissionResult.stdout.trim() == expectedOutput[i].trim();
             if(status == false){
-                let warning = `${expectedOutput} was expected but your program gave the output ${output} for the problem ${problem_statement}.`;
-                return res.render("test.ejs", {warning: warning})
+                let warning = `${expectedOutput[i]} was expected but your program gave the output ${submissionResult.stdout} for the problem ${problem_statement}.`;
+                return res.render("test.ejs", {warning: warning});
             }
-            userSubmissionDetails.push({input: input, expected_output: expectedOutput, your_output: submissionResult.stdout, status: status});
+            
         }
         updateCreds(req.user, creds);
+        res.redirect('/test');
     } else{
         // what to do here?
         res.status(500).send("Error in processing code submission.");

@@ -32,8 +32,8 @@
                 <h4> Credits: <%= qs[i].credits %></h4>
                 <h5>Tags: [<%= qs[i].tags %>]</h5>
             </div>
-            <input type="text" style="margin-left: 7%; width: 73.7%;" name="language" placeholder="Enter the language you are using: We support Python, Java, CPP, C, JavaScript, among many others." autofocus/>
             <input type="hidden" name="qtitle" value="<%= qs[i].title %>"/>
+            <input type="text" style="margin-left: 7%; width: 73.7%;" name="language" placeholder="Enter the language you are using: We support Python, Java, CPP, C, JavaScript, among many others." autofocus/>
             <textarea rows="20" cols="60" name="submission" style="margin-left: 7%;" spellcheck="false"></textarea>
             <button type="submit" class="btn btn-outline-light btn-lg" style="margin-top: 3%; margin-left: 40%;"> Run code </button>
         </form>
