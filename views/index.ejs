@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>CodeMania</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <link href="style.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap">
+
+     </head>
+     <body>
+        
+        <div class="credentials" style="margin-bottom: 4%;">
+            <header>
+                <h1>CodeMania</h1>
+            </header>
+            <form action="/logindirect" method="GET">
+                <button type="submit" class="btn btn-outline-light btn-lg">Log-in</button>
+            </form>
+            <form action="/signupdirect" method="GET">
+                <button type="submit" class="btn btn-outline-light btn-lg">Sign-up</button>
+            </form>
+            <form action="/profile" method="GET">
+                <button type="submit" class="btn btn-outline-light btn-lg">Profile</button>
+            </form>
+            <form action="/logout" method="POST">
+                <button type="submit" class="btn btn-outline-light btn-lg">Log-out</button>
+            </form>
+        </div>
+        <% if(locals.msg) { %>
+            <h4> CodeManiac: <%= msg %></h4>
+        <% } %>
+        <div class="redirect" style="display:block;">
+            <form action="/test" method="GET">
+                <div class="first">
+                <input type="radio" name="format" id="long" value="long"/>
+                <label for="long"><h4>Long</h4></label>
+                <input type="radio" name="format" value="short"/>
+                <label for="short"><h4>Short</h4></label> </div>
+                <div class="second">
+                <label for="topic"><h4>Choose a topic</h4></label>
+
+                <select name="topic" id="topic">
+                  <option value="all">Random topics</option>
+                  <option value="algo">Algorithms</option>
+                  <option value="ds">Data Structures</option>
+                  <option value="arr">Arrays</option>
+                  <option value="str">Strings</option>
+                  <option value="ll">Linked List</option>
+                  <option value="trees">Trees</option>
+                  <option value="heaps">Heaps</option>
+                  <option value="graphs">Graphs</option>
+                  <option value="greedy">Greedy</option>
+                  <option value="dp">DP</option>
+                  <option value="begin">Beginner</option>
+                  <option value="bs">Binary Search</option>
+                  <option value="sort">Sorting</option>
+                  <option value="twoptr">Two Pointers</option>
+                  <option value="bt">Backtracking & Recursion</option>
+                  <option value="adv_ds">Advanced DS</option>
+                </select> </div>
+                <div class="third">
+                <input type="radio" name="diff" id="Easy" value="Easy"/>
+                <label for="Easy"><h4>Easy</h4></label>
+                <input type="radio" name="diff" id="Medium" value="Medium"/>
+                <label for="Medium"><h4>Medium</h4></label> 
+                <input type="radio" name="diff" id="Hard" value="Hard"/>
+                <label for="Hard"><h4>Hard</h4></label> 
+                </div>
+                <button type="submit" class="btn btn-outline-light btn-lg">Go there</button>
+            </form>
+        </div>
+     </body>
+</html>
