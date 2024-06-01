@@ -12,16 +12,19 @@ import pg from "pg";
 import ejs from "ejs";
 import axios from "axios";
 import cookieParser from "cookie-parser";
+import LlamaAI from "llamaai";
 
 const app = express();
 const port = 3000;
 
 app.use(express.static("public"));
+app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 app.use(cookieParser())
 
 // paste
+
 
 
 
@@ -115,6 +118,7 @@ async function runCode(language, src_code, input) {
                     'Content-Type': 'application/json',
                     // paste 
                     
+                    
                 },
             }
         )
@@ -160,6 +164,7 @@ app.post("/run-code", authenticate, async (req, res) => {
     
 })
 
+
 app.get("/test", async (req, res) => {
     const {format, topic, diff} = req.query;
     // const long_num = 8;
@@ -187,6 +192,56 @@ app.get("/test", async (req, res) => {
     }
     //res.render("test.ejs");
 });
+
+//paste
+const llamaAPI = new LlamaAI(API_KEY);
+
+app.get("/interview", async (req, res) => {
+    // Build the Request
+    console.log(req.body.info)
+    const info = "I am Sridevi, a second year CS undergraduate. I am affluent in OOP, web dev and competitive coding. I am interested to learn app dev, ML, AI and game dev.";
+    //console.log(info);
+    const apiRequestJson = {
+    "messages": [
+        {"role": "user", "content": info},
+    ],
+    "functions": [
+        {
+            "name": "interview_the_user",
+            "description": "Act as an interviewer and based off the information given by the user, ask the user typical software engineering interview questions based on the user's strengths as well as LeetCode medium questions. Ask them about their projects and experience as well. The user is a computer science undergraduate, ask them questions related to their coursework as well.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "questions": {
+                        "type": "string",
+                        "description": "A list of the questions you want to ask the user.",
+                    },
+                    "time_limit": {
+                        "type": "number",
+                        "description": "Average time limit for a user to respond to each question",
+                    },
+                    "expected_response" : {
+                        "type": "string",
+                        "description": "The correct answer for each question.",
+                    }
+                },
+            },
+            "required": ["questions", "time_limit"],
+        }
+    ],
+    "stream": false,
+    "function_call": "interview_the_user",
+   };
+   try {
+        const response = await llamaAPI.run(apiRequestJson);
+        console.log(response.choices[0].message.function_call.arguments.interests);
+        //const response_json = await response.json(); 
+        res.render("interviewer.ejs", { msg: response });
+    } catch (error) {
+        console.error(error);
+        res.render("interviewer.ejs", { msg: "exception caught!" });
+    }
+})
 
 app.get("/profile", (req, res) => {
     res.render("profile.ejs");
